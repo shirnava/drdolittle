@@ -18,7 +18,6 @@ const int ina1=7;
 const int inb1=8;
 
 // wheel motors setup done
-
 const int lglswi =34;//left gate limit switch
 const int rglswi =36;//right gate limit switch
 const int slswi =38; //slide limit switch 
@@ -34,60 +33,73 @@ int TimerA;
 // counter created to know which number bowl the robot has reached
 // timer created to allow the robot to continue
 // a little after the "flag"(where the bowl is situated)
-
 void setup()
 {
 Serial.begin(9600); // communication between the computer and the controller 
+
+// white line sensor set as INPUT
   pinMode(26,INPUT);//left white sensor
   pinMode(24,INPUT);//middle white sensor
   pinMode(22,INPUT);//right white sensor
 
-//white line sensor set as INPUT
-
+// 4,9left motors
   pinMode(6,OUTPUT);
   pinMode(4,OUTPUT);
   pinMode(9,OUTPUT);
-//4,9left motors
+
+// 7,8=right motors 
+// wheel motors set as OUTPUT
   pinMode(5,OUTPUT);
   pinMode(7,OUTPUT);
   pinMode(8,OUTPUT);
-//7,8=right motors 
-//wheel motors set as OUTPUT
+
+// limit switches set as INPUT
   pinMode(34,INPUT);
   pinMode(36,INPUT);
   pinMode(38,INPUT); 
-//limit switches set as INPUT
+
+// ardumoto
+// gate motor set as OUTPUT
   pinMode(3,OUTPUT);
   pinMode(12,OUTPUT); 
-//ardumoto
-//gate motor set as OUTPUT
 }
 void loop()
 {
-
-    if(digitalRead(digpin2)==LOW) //if the middle sensor senses the black line
+    // if the middle sensor senses the black line
+    if(digitalRead(digpin2)==LOW) 
     {
-      driveForward(); //function that makes the robot drive forward
+     // function that makes the robot drive forward
+      driveForward(); 
     }
-    if(digitalRead(digpin1)==LOW) //if the left sensor senses the black line
+    // if the left sensor senses the black line
+    if(digitalRead(digpin1)==LOW) 
     {
-      deviateLeft(); //function that makes robot move slightly left
+      // function that makes robot move slightly left
+      deviateLeft(); 
     }
-    if(digitalRead(digpin3)==LOW) //if the right sensor senses the black line
+    // if the right sensor senses the black line
+    if(digitalRead(digpin3)==LOW) 
     {
-      deviateRight(); //function that makes the robot move slightly right
+      // function that makes the robot move slightly right
+      deviateRight(); 
     }
 
-  if(digitalRead(digpin1)==HIGH&&digitalRead(digpin2)==HIGH&&digitalRead(digpin3==HIGH)) // if all sensors sense white (no black line detected)
-    road++; //count additional bowl, every station has a long white line to be detected by the robot as a bowl
+  // if all sensors sense white (no black line detected)
+  if(digitalRead(digpin1)==HIGH&&digitalRead(digpin2)==HIGH&&digitalRead(digpin3==HIGH)) 
+      // count additional bowl, every station has a long white line to be detected by the robot as a bowl
+      road++; 
 
-if(digitalRead(slswi)==LOW)//bowl detected-limit switch was pressed
+// bowl detected-limit switch was pressed
+if(digitalRead(slswi)==LOW)
   {
-    stopDriving(); //function that makes robot stop
-    delay (100); //wait 100 mili seconds
+    // function that makes robot stop
+    stopDriving(); 
 
-    TimerA=millis(); //Timer equals millis: function that calculates the 
-                     // time that elapsed since the start of the program
+    // wait 100 mili seconds
+    delay (100); 
+
+    // Timer equals millis: function that calculates the time that elapsed since the start of the program
+    TimerA=millis(); 
       while(millis()-TimerA<700) 
       // as long as this condition: the current time that has passed since the start
       // of the program minus the time we found earlier(TimerA) is smaller than 700 miliseconds
@@ -108,49 +120,55 @@ if(digitalRead(slswi)==LOW)//bowl detected-limit switch was pressed
         }
       }
 
+    // stop driving, wait 100 mili-seconds
     stopDriving();
-    delay (100) ; //stop driving, wait 100 mili-seconds
-      while(digitalRead(rglswi)== HIGH) // as long as the limit switch to the right
-                                        // of the container is not pushed
-                                        // (the gate still hasn't upened all the way)
+    delay (100); 
+
+    // as long as the limit switch to the right of the container 
+    // is not pushed (the gate still hasn't upened all the way)
+      while(digitalRead(rglswi)== HIGH) 
       {
-        digitalWrite(12,LOW); //Counterclockwise
+        digitalWrite(12,LOW); // Counterclockwise
         analogWrite(3,60); // SPEED OF LIFTING 45 
        }
        
-     //activate the gate motor until the gate is fully open(food is coming out through gate)
- 
-    digitalWrite( 12,HIGH); //Counterclockwise
+    // activate the gate motor until the gate is fully open(food is 
+    // coming out through gate)
+    digitalWrite( 12,HIGH); // Counterclockwise
     analogWrite(3,0); 
-    //
+    
+    // wait 2 seconds
     delay(2000);   
-//wait 2 seconds
 
-      if(road==2) //if it's the first bowl
+      // if it's the first bowl
+      if(road==2) 
       {
+        // wait the amount of time we previously noted
+        // in respect to the amount of food we aim to release to the first bowl
         delay(bowl1); 
-// wait the amount of time we previously noted
-// in respect to the amount of food we aim to release to the first bowl
       }
-      if(road==3) //if it's the second bowl
+       // if it's the second bowl
+      if(road==3)
       {
+        // wait the amount of time we previously noted
+        // in respect to the amount of food we aim to release to the second bowl
         delay(bowl2);  
-// wait the amount of time we previously noted
-// in respect to the amount of food we aim to release to the second bowl
       }
 
+    // activate the gate motor in the opposite direction
+    // until the gate is closed(if the left limit is activated
+    // and the gate returned to its original state-closed
     digitalWrite(12,HIGH); //Counterclockwise
     analogWrite(3,55);
-// activate the gate motor in the opposite direction
-// until the gate is closed(if the left limit is activated
-// and the gate returned to its original state-closed
-      if(digitalRead(lglswi)==LOW)//check if the gate is closed 
+
+    // check if the gate is closed 
+      if(digitalRead(lglswi)==LOW)
       {
+        // stop the gate motor if closed
         digitalWrite(12,LOW);
         analogWrite(3,0);
-//stop the gate motor if closed
       } 
-  }//motor-stop
+  }// motor-stop
 
 }
 void driveForward () 
